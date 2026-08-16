@@ -1,0 +1,563 @@
+# Reading pref.tcl
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 10:04:42 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/window_generator.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_window_generator.v 
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module window_generator
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_window_generator
+# End time: 10:04:42 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# vsim work.tb_window_generator 
+# Start time: 10:04:42 on Aug 16,2026
+# Loading work.tb_window_generator
+# Loading work.window_generator
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftccg99v".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftccg99v
+# ==================================================
+#    Starting Sliding Window Testbench              
+#    IMAGE_WIDTH = 32 pixels                        
+# ==================================================
+# --- Window at Cycle 68 ---
+# [ 66] [ 67] [ 68]
+# [ 34] [ 35] [ 36]
+# [  2] [  3] [  4]
+# [ERROR] Spatial alignment failed on Column 2!
+# [ERROR] Spatial alignment failed on Column 1!
+# ==================================================
+#    TEST FAILED! Total errors detected:           2
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_window_generator.v(111)
+#    Time: 1016 ns  Iteration: 0  Instance: /tb_window_generator
+# 1
+# Break in Module tb_window_generator at ../testbenches/tb_window_generator.v line 111
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 10:10:49 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/window_generator.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_window_generator.v 
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module window_generator
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_window_generator
+# End time: 10:10:49 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 10:10:54 on Aug 16,2026, Elapsed time: 0:06:12
+# Errors: 0, Warnings: 2
+# vsim work.tb_window_generator 
+# Start time: 10:10:54 on Aug 16,2026
+# Loading work.tb_window_generator
+# Loading work.window_generator
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlft8saf87".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlft8saf87
+# ==================================================
+#    Starting Sliding Window Testbench              
+#    IMAGE_WIDTH = 32 pixels                        
+# ==================================================
+# --- Window at Cycle 68 ---
+# [  2] [  3] [  4]
+# [ 34] [ 35] [ 36]
+# [ 66] [ 67] [ 68]
+# ==================================================
+#    TEST PASSED SUCCESSFULLY! Window perfectly aligned.
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_window_generator.v(111)
+#    Time: 1016 ns  Iteration: 0  Instance: /tb_window_generator
+# 1
+# Break in Module tb_window_generator at ../testbenches/tb_window_generator.v line 111
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 10:45:30 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/window_generator.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_window_generator.v 
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module window_generator
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_window_generator
+# End time: 10:45:30 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 10:45:31 on Aug 16,2026, Elapsed time: 0:34:37
+# Errors: 0, Warnings: 2
+# vsim work.tb_pe_array 
+# Start time: 10:45:31 on Aug 16,2026
+# Loading work.tb_pe_array
+# Loading work.pe_array
+# Loading work.mac_unit
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftfrjcza".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftfrjcza
+# ==================================================
+#    Starting PE Array Pipelined Testbench          
+# ==================================================
+# [SUCCESS] Test Case 1 (Sobel-X) Passed. Computed: 8
+# [SUCCESS] Test Case 2 (Min Saturation) Passed. Computed: -293760
+# ==================================================
+#    TEST PASSED SUCCESSFULLY! All pipelines matched.
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_pe_array.v(140)
+#    Time: 116 ns  Iteration: 0  Instance: /tb_pe_array
+# 1
+# Break in Module tb_pe_array at ../testbenches/tb_pe_array.v line 140
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 10:58:17 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/post_processing.v ../RTL/window_generator.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_post_processing.v ../testbenches/tb_window_generator.v 
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module post_processing
+# -- Compiling module window_generator
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_post_processing
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_post_processing
+# 	tb_window_generator
+# End time: 10:58:17 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 10:58:18 on Aug 16,2026, Elapsed time: 0:12:47
+# Errors: 0, Warnings: 2
+# vsim work.tb_post_processing 
+# Start time: 10:58:18 on Aug 16,2026
+# Loading work.tb_post_processing
+# Loading work.post_processing
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftcis1w5".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftcis1w5
+# ==================================================
+#    Starting Post-Processing Testbench             
+# ==================================================
+# [SUCCESS]                                                                           Normal Positive Passthrough | In: 15000 -> Out: 15000
+# [SUCCESS]                                                                           Normal Negative Passthrough | In: -20000 -> Out: -20000
+# [SUCCESS]                                                                          Positive Overflow Saturation | In: 100000 -> Out: 32767
+# [SUCCESS]                                                                          Negative Overflow Saturation | In: -250000 -> Out: -32768
+# [SUCCESS]                                                                        ReLU Enabled - Positive Number | In: 12000 -> Out: 12000
+# [SUCCESS]                                                                   ReLU Enabled - Negative Number to 0 | In: -5000 -> Out: 0
+# [SUCCESS]                                                                      ReLU Enabled - Neg Overflow to 0 | In: -250000 -> Out: 0
+# ==================================================
+#    TEST PASSED SUCCESSFULLY! All modes working.
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_post_processing.v(97)
+#    Time: 86 ns  Iteration: 0  Instance: /tb_post_processing
+# 1
+# Break in Module tb_post_processing at ../testbenches/tb_post_processing.v line 97
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 11:12:40 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/control_fsm.v ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/post_processing.v ../RTL/window_generator.v ../testbenches/tb_control_fsm.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_post_processing.v ../testbenches/tb_window_generator.v 
+# -- Compiling module control_fsm
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module post_processing
+# -- Compiling module window_generator
+# -- Compiling module tb_control_fsm
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_post_processing
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_control_fsm
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_post_processing
+# 	tb_window_generator
+# End time: 11:12:40 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 11:12:41 on Aug 16,2026, Elapsed time: 0:14:23
+# Errors: 0, Warnings: 2
+# vsim work.tb_control_fsm 
+# Start time: 11:12:41 on Aug 16,2026
+# Loading work.tb_control_fsm
+# Loading work.control_fsm
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftxb0xig".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftxb0xig
+# ==================================================
+#    Starting Control FSM Testbench                 
+#    Testing with a 5x5 Input Image                 
+# ==================================================
+# [T=225000] Valid Output Pixel #1 generated.
+# [T=235000] Valid Output Pixel #2 generated.
+# [T=245000] Valid Output Pixel #3 generated.
+# [T=275000] Valid Output Pixel #4 generated.
+# [T=285000] Valid Output Pixel #5 generated.
+# [T=295000] Valid Output Pixel #6 generated.
+# [T=345000] Valid Output Pixel #7 generated.
+# [T=355000] Valid Output Pixel #8 generated.
+# [T=365000] Valid Output Pixel #9 generated.
+# ==================================================
+# [SUCCESS] Exact output valid count verified (9). Pipeline timing is perfect.
+#    TEST PASSED SUCCESSFULLY!                      
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_control_fsm.v(115)
+#    Time: 455 ns  Iteration: 1  Instance: /tb_control_fsm
+# 1
+# Break in Module tb_control_fsm at ../testbenches/tb_control_fsm.v line 115
+add wave -position insertpoint  \
+sim:/tb_control_fsm/uut/valid_window \
+sim:/tb_control_fsm/uut/valid_pipeline
+add wave -position insertpoint  \
+sim:/tb_control_fsm/uut/valid_out
+restart -f
+# ** Note: (vsim-12125) Error and warning message counts have been reset to '0' because of 'restart'.
+run -all
+# GetModuleFileName: The specified module could not be found.
+# 
+# 
+# ==================================================
+#    Starting Control FSM Testbench                 
+#    Testing with a 5x5 Input Image                 
+# ==================================================
+# [T=225000] Valid Output Pixel #1 generated.
+# [T=235000] Valid Output Pixel #2 generated.
+# [T=245000] Valid Output Pixel #3 generated.
+# [T=275000] Valid Output Pixel #4 generated.
+# [T=285000] Valid Output Pixel #5 generated.
+# [T=295000] Valid Output Pixel #6 generated.
+# [T=345000] Valid Output Pixel #7 generated.
+# [T=355000] Valid Output Pixel #8 generated.
+# [T=365000] Valid Output Pixel #9 generated.
+# ==================================================
+# [SUCCESS] Exact output valid count verified (9). Pipeline timing is perfect.
+#    TEST PASSED SUCCESSFULLY!                      
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_control_fsm.v(115)
+#    Time: 455 ns  Iteration: 1  Instance: /tb_control_fsm
+# 1
+# Break in Module tb_control_fsm at ../testbenches/tb_control_fsm.v line 115
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 11:43:52 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/control_fsm.v ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/post_processing.v ../RTL/window_generator.v ../testbenches/tb_control_fsm.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_post_processing.v ../testbenches/tb_window_generator.v 
+# -- Compiling module control_fsm
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module post_processing
+# -- Compiling module window_generator
+# -- Compiling module tb_control_fsm
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_post_processing
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_control_fsm
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_post_processing
+# 	tb_window_generator
+# End time: 11:43:52 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 11:43:53 on Aug 16,2026, Elapsed time: 0:31:12
+# Errors: 0, Warnings: 0
+# vsim work.tb_control_fsm 
+# Start time: 11:43:53 on Aug 16,2026
+# Loading work.tb_control_fsm
+# Loading work.control_fsm
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftz0dc52".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftz0dc52
+# ==================================================
+#    Starting Control FSM Testbench                 
+#    Testing with a 10x10 Input Image               
+# ==================================================
+# [T=305000] Valid Output Pixel #1 generated.
+# [T=315000] Valid Output Pixel #2 generated.
+# [T=325000] Valid Output Pixel #3 generated.
+# [T=355000] Valid Output Pixel #4 generated.
+# [T=365000] Valid Output Pixel #5 generated.
+# [T=375000] Valid Output Pixel #6 generated.
+# [T=385000] Valid Output Pixel #7 generated.
+# [T=395000] Valid Output Pixel #8 generated.
+# [T=425000] Valid Output Pixel #9 generated.
+# [T=435000] Valid Output Pixel #10 generated.
+# [T=445000] Valid Output Pixel #11 generated.
+# [T=455000] Valid Output Pixel #12 generated.
+# [T=465000] Valid Output Pixel #13 generated.
+# [T=475000] Valid Output Pixel #14 generated.
+# [T=485000] Valid Output Pixel #15 generated.
+# [T=495000] Valid Output Pixel #16 generated.
+# [T=525000] Valid Output Pixel #17 generated.
+# [T=535000] Valid Output Pixel #18 generated.
+# [T=545000] Valid Output Pixel #19 generated.
+# [T=555000] Valid Output Pixel #20 generated.
+# [T=565000] Valid Output Pixel #21 generated.
+# [T=575000] Valid Output Pixel #22 generated.
+# [T=585000] Valid Output Pixel #23 generated.
+# [T=595000] Valid Output Pixel #24 generated.
+# [T=625000] Valid Output Pixel #25 generated.
+# [T=635000] Valid Output Pixel #26 generated.
+# [T=645000] Valid Output Pixel #27 generated.
+# [T=655000] Valid Output Pixel #28 generated.
+# [T=665000] Valid Output Pixel #29 generated.
+# [T=675000] Valid Output Pixel #30 generated.
+# [T=685000] Valid Output Pixel #31 generated.
+# [T=695000] Valid Output Pixel #32 generated.
+# [T=725000] Valid Output Pixel #33 generated.
+# [T=735000] Valid Output Pixel #34 generated.
+# [T=745000] Valid Output Pixel #35 generated.
+# [T=755000] Valid Output Pixel #36 generated.
+# [T=765000] Valid Output Pixel #37 generated.
+# [T=775000] Valid Output Pixel #38 generated.
+# [T=785000] Valid Output Pixel #39 generated.
+# [T=795000] Valid Output Pixel #40 generated.
+# [T=825000] Valid Output Pixel #41 generated.
+# [T=835000] Valid Output Pixel #42 generated.
+# [T=845000] Valid Output Pixel #43 generated.
+# [T=875000] Valid Output Pixel #44 generated.
+# [T=885000] Valid Output Pixel #45 generated.
+# [T=895000] Valid Output Pixel #46 generated.
+# [T=905000] Valid Output Pixel #47 generated.
+# [T=915000] Valid Output Pixel #48 generated.
+# [T=945000] Valid Output Pixel #49 generated.
+# [T=955000] Valid Output Pixel #50 generated.
+# [T=965000] Valid Output Pixel #51 generated.
+# [T=975000] Valid Output Pixel #52 generated.
+# [T=985000] Valid Output Pixel #53 generated.
+# [T=995000] Valid Output Pixel #54 generated.
+# [T=1005000] Valid Output Pixel #55 generated.
+# [T=1015000] Valid Output Pixel #56 generated.
+# [T=1045000] Valid Output Pixel #57 generated.
+# [T=1055000] Valid Output Pixel #58 generated.
+# [T=1065000] Valid Output Pixel #59 generated.
+# [T=1075000] Valid Output Pixel #60 generated.
+# [T=1085000] Valid Output Pixel #61 generated.
+# [T=1095000] Valid Output Pixel #62 generated.
+# [T=1105000] Valid Output Pixel #63 generated.
+# [T=1115000] Valid Output Pixel #64 generated.
+# ==================================================
+# [SUCCESS] Exact output valid count verified (64). Pipeline timing is perfect.
+#    TEST PASSED SUCCESSFULLY!                      
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_control_fsm.v(115)
+#    Time: 1205 ns  Iteration: 1  Instance: /tb_control_fsm
+# 1
+# Break in Module tb_control_fsm at ../testbenches/tb_control_fsm.v line 115
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 11:53:17 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/control_fsm.v ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/post_processing.v ../RTL/top_cnn_accelerator.v ../RTL/window_generator.v ../testbenches/tb_control_fsm.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_post_processing.v ../testbenches/tb_top_cnn_accelerator.v ../testbenches/tb_window_generator.v 
+# -- Compiling module control_fsm
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module post_processing
+# -- Compiling module top_cnn_accelerator
+# -- Compiling module window_generator
+# -- Compiling module tb_control_fsm
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_post_processing
+# -- Compiling module tb_top_cnn_accelerator
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_control_fsm
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_post_processing
+# 	tb_top_cnn_accelerator
+# 	tb_window_generator
+# End time: 11:53:17 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 11:53:23 on Aug 16,2026, Elapsed time: 0:09:30
+# Errors: 0, Warnings: 2
+# vsim work.tb_top_cnn_accelerator 
+# Start time: 11:53:23 on Aug 16,2026
+# Loading work.tb_top_cnn_accelerator
+# Loading work.top_cnn_accelerator
+# Loading work.kernel_config_regs
+# Loading work.control_fsm
+# Loading work.window_generator
+# Loading work.pe_array
+# Loading work.mac_unit
+# Loading work.post_processing
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftvivhvn".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftvivhvn
+# ==================================================
+#    Starting Top-Level Accelerator Testbench       
+# ==================================================
+# [T=415000] Out #1 Validated | Pipeline Value =    x
+# [ERROR] Math failed! Expected even number, got x
+# [T=425000] Out #2 Validated | Pipeline Value =   16
+# [T=435000] Out #3 Validated | Pipeline Value =   18
+# [T=445000] Out #4 Validated | Pipeline Value =   20
+# [T=475000] Out #5 Validated | Pipeline Value =   26
+# [T=485000] Out #6 Validated | Pipeline Value =   28
+# [T=495000] Out #7 Validated | Pipeline Value =   30
+# [T=505000] Out #8 Validated | Pipeline Value =   32
+# [T=535000] Out #9 Validated | Pipeline Value =   38
+# [T=545000] Out #10 Validated | Pipeline Value =   40
+# [T=555000] Out #11 Validated | Pipeline Value =   42
+# [T=565000] Out #12 Validated | Pipeline Value =   44
+# [T=595000] Out #13 Validated | Pipeline Value =   50
+# [T=605000] Out #14 Validated | Pipeline Value =   52
+# [T=615000] Out #15 Validated | Pipeline Value =   54
+# [T=625000] Out #16 Validated | Pipeline Value =   56
+# ==================================================
+# [SUCCESS] Received exactly 16 valid output flags.
+#    TEST FAILED! Total errors detected: 1
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_top_cnn_accelerator.v(126)
+#    Time: 765 ns  Iteration: 1  Instance: /tb_top_cnn_accelerator
+# 1
+# Break in Module tb_top_cnn_accelerator at ../testbenches/tb_top_cnn_accelerator.v line 126
+do ../Scripts/run.do
+# ** Warning: (vlib-34) Library already exists at "work".
+# Model Technology ModelSim - Intel FPGA Edition vlog 2020.1 Compiler 2020.02 Feb 28 2020
+# Start time: 11:56:52 on Aug 16,2026
+# vlog -reportprogress 300 ../RTL/control_fsm.v ../RTL/kernel_config_regs.v ../RTL/mac_unit.v ../RTL/pe_array.v ../RTL/post_processing.v ../RTL/top_cnn_accelerator.v ../RTL/window_generator.v ../testbenches/tb_control_fsm.v ../testbenches/tb_kernel_config_regs.v ../testbenches/tb_mac_unit.v ../testbenches/tb_pe_array.v ../testbenches/tb_post_processing.v ../testbenches/tb_top_cnn_accelerator.v ../testbenches/tb_window_generator.v 
+# -- Compiling module control_fsm
+# -- Compiling module kernel_config_regs
+# -- Compiling module mac_unit
+# -- Compiling module pe_array
+# -- Compiling module post_processing
+# -- Compiling module top_cnn_accelerator
+# -- Compiling module window_generator
+# -- Compiling module tb_control_fsm
+# -- Compiling module tb_kernel_config_regs
+# -- Compiling module tb_mac_unit
+# -- Compiling module tb_pe_array
+# -- Compiling module tb_post_processing
+# -- Compiling module tb_top_cnn_accelerator
+# -- Compiling module tb_window_generator
+# 
+# Top level modules:
+# 	tb_control_fsm
+# 	tb_kernel_config_regs
+# 	tb_mac_unit
+# 	tb_pe_array
+# 	tb_post_processing
+# 	tb_top_cnn_accelerator
+# 	tb_window_generator
+# End time: 11:56:52 on Aug 16,2026, Elapsed time: 0:00:00
+# Errors: 0, Warnings: 0
+# End time: 11:56:57 on Aug 16,2026, Elapsed time: 0:03:34
+# Errors: 0, Warnings: 2
+# vsim work.tb_top_cnn_accelerator 
+# Start time: 11:56:57 on Aug 16,2026
+# Loading work.tb_top_cnn_accelerator
+# Loading work.top_cnn_accelerator
+# Loading work.kernel_config_regs
+# Loading work.control_fsm
+# Loading work.window_generator
+# Loading work.pe_array
+# Loading work.mac_unit
+# Loading work.post_processing
+# ** Warning: (vsim-WLF-5000) WLF file currently in use: vsim.wlf
+#           File in use by: Victus  Hostname: DESKTOP-BQIVT2M  ProcessID: 17484
+#           Attempting to use alternate WLF file "./wlftvbnhfw".
+# ** Warning: (vsim-WLF-5001) Could not open WLF file: vsim.wlf
+#           Using alternate file: ./wlftvbnhfw
+# ==================================================
+#    Starting Top-Level CNN Accelerator Testbench   
+#    Image Size: 8x8                                
+# ==================================================
+# --> Configuring Kernel Bank 0...
+# --> Streaming 8x8 Input Image...
+# [T=465000] Output #1 Valid | Result =      x
+# [T=475000] Output #2 Valid | Result =     20
+# [T=485000] Output #3 Valid | Result =     22
+# [T=495000] Output #4 Valid | Result =     24
+# [T=505000] Output #5 Valid | Result =     26
+# [T=515000] Output #6 Valid | Result =     28
+# [T=545000] Output #7 Valid | Result =     34
+# [T=555000] Output #8 Valid | Result =     36
+# [T=565000] Output #9 Valid | Result =     38
+# [T=575000] Output #10 Valid | Result =     40
+# [T=585000] Output #11 Valid | Result =     42
+# [T=595000] Output #12 Valid | Result =     44
+# [T=625000] Output #13 Valid | Result =     50
+# [T=635000] Output #14 Valid | Result =     52
+# [T=645000] Output #15 Valid | Result =     54
+# [T=655000] Output #16 Valid | Result =     56
+# [T=665000] Output #17 Valid | Result =     58
+# [T=675000] Output #18 Valid | Result =     60
+# [T=705000] Output #19 Valid | Result =     66
+# [T=715000] Output #20 Valid | Result =     68
+# [T=725000] Output #21 Valid | Result =     70
+# [T=735000] Output #22 Valid | Result =     72
+# [T=745000] Output #23 Valid | Result =     74
+# [T=755000] Output #24 Valid | Result =     76
+# [T=785000] Output #25 Valid | Result =     82
+# [T=795000] Output #26 Valid | Result =     84
+# [T=805000] Output #27 Valid | Result =     86
+# [T=815000] Output #28 Valid | Result =     88
+# [T=825000] Output #29 Valid | Result =     90
+# [T=835000] Output #30 Valid | Result =     92
+# [T=865000] Output #31 Valid | Result =     98
+# [T=875000] Output #32 Valid | Result =    100
+# [T=885000] Output #33 Valid | Result =    102
+# [T=895000] Output #34 Valid | Result =    104
+# [T=905000] Output #35 Valid | Result =    106
+# [T=915000] Output #36 Valid | Result =    108
+# ==================================================
+# [SUCCESS] Correct number of output pixels generated (36).
+#    TEST PASSED SUCCESSFULLY! Integration complete.
+# ==================================================
+# ** Note: $finish    : ../testbenches/tb_top_cnn_accelerator.v(159)
+#    Time: 1055 ns  Iteration: 1  Instance: /tb_top_cnn_accelerator
+# 1
+# Break in Module tb_top_cnn_accelerator at ../testbenches/tb_top_cnn_accelerator.v line 159
