@@ -48,17 +48,17 @@ module pe_array (
     wire signed [15:0] prod10, prod11, prod12;
     wire signed [15:0] prod20, prod21, prod22;
 
-    mac_unit #(.USE_DSP("NO")) mac00 (.clk(clk), .rst_n(rst_n), .pixel_in(p00), .weight_in(w00), .product_out(prod00));
-    mac_unit #(.USE_DSP("NO")) mac01 (.clk(clk), .rst_n(rst_n), .pixel_in(p01), .weight_in(w01), .product_out(prod01));
-    mac_unit #(.USE_DSP("NO")) mac02 (.clk(clk), .rst_n(rst_n), .pixel_in(p02), .weight_in(w02), .product_out(prod02));
+    mac_unit #(.USE_DSP("YES")) mac00 (.clk(clk), .rst_n(rst_n), .pixel_in(p00), .weight_in(w00), .product_out(prod00));
+    mac_unit #(.USE_DSP("YES")) mac01 (.clk(clk), .rst_n(rst_n), .pixel_in(p01), .weight_in(w01), .product_out(prod01));
+    mac_unit #(.USE_DSP("YES")) mac02 (.clk(clk), .rst_n(rst_n), .pixel_in(p02), .weight_in(w02), .product_out(prod02));
     
-    mac_unit #(.USE_DSP("NO")) mac10 (.clk(clk), .rst_n(rst_n), .pixel_in(p10), .weight_in(w10), .product_out(prod10));
-    mac_unit #(.USE_DSP("NO")) mac11 (.clk(clk), .rst_n(rst_n), .pixel_in(p11), .weight_in(w11), .product_out(prod11));
-    mac_unit #(.USE_DSP("NO")) mac12 (.clk(clk), .rst_n(rst_n), .pixel_in(p12), .weight_in(w12), .product_out(prod12));
+    mac_unit #(.USE_DSP("YES")) mac10 (.clk(clk), .rst_n(rst_n), .pixel_in(p10), .weight_in(w10), .product_out(prod10));
+    mac_unit #(.USE_DSP("YES")) mac11 (.clk(clk), .rst_n(rst_n), .pixel_in(p11), .weight_in(w11), .product_out(prod11));
+    mac_unit #(.USE_DSP("YES")) mac12 (.clk(clk), .rst_n(rst_n), .pixel_in(p12), .weight_in(w12), .product_out(prod12));
     
-    mac_unit #(.USE_DSP("NO")) mac20 (.clk(clk), .rst_n(rst_n), .pixel_in(p20), .weight_in(w20), .product_out(prod20));
-    mac_unit #(.USE_DSP("NO")) mac21 (.clk(clk), .rst_n(rst_n), .pixel_in(p21), .weight_in(w21), .product_out(prod21));
-    mac_unit #(.USE_DSP("NO")) mac22 (.clk(clk), .rst_n(rst_n), .pixel_in(p22), .weight_in(w22), .product_out(prod22));
+    mac_unit #(.USE_DSP("YES")) mac20 (.clk(clk), .rst_n(rst_n), .pixel_in(p20), .weight_in(w20), .product_out(prod20));
+    mac_unit #(.USE_DSP("YES")) mac21 (.clk(clk), .rst_n(rst_n), .pixel_in(p21), .weight_in(w21), .product_out(prod21));
+    mac_unit #(.USE_DSP("YES")) mac22 (.clk(clk), .rst_n(rst_n), .pixel_in(p22), .weight_in(w22), .product_out(prod22));
 
     // ------------------------------------------------------------------------
     // 3. Pipelined Adder Tree
