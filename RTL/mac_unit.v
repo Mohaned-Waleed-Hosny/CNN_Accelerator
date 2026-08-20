@@ -12,24 +12,50 @@
 
 module mac_unit #(
     // Parameter to control DSP usage. 
-    // Set to "NO" to force synthesis into fabric LUTs for FOM score optimization.
-    parameter USE_DSP = "NO"
+    // Set to "YES" to use DSP blocks, or "NO" to force synthesis into LUTs.
+    parameter USE_DSP = "YES"
 )(
-    input  wire               clk,          // System Clock
-    input  wire               rst_n,        // Active-Low Synchronous/Async Reset
-    input  wire [7:0]         pixel_in,     // 8-bit Unsigned Input Pixel
-    input  wire signed [7:0]  weight_in,    // 8-bit Signed Kernel Weight
-    output reg  signed [15:0] product_out   // 16-bit Signed Product Output
+    input  wire              clk,          // System Clock
+    input  wire              rst_n,        // Active-Low Synchronous/Async Reset
+    input  wire [7:0]        pixel_in,     // 8-bit Unsigned Input Pixel
+    input  wire signed [7:0] weight_in,    // 8-bit Signed Kernel Weight
+    output reg  signed [15:0] product_out  // 16-bit Signed Product Output
 );
 
-    // Optional synthesis attribute forcing synthesis engine placement logic
-    (* use_dsp = USE_DSP *) 
     wire signed [15:0] mult_result;
+    
+    // Explicit sign extension: Concatenate '0' to unsigned pixel to safely cast it to signed
+    wire signed [8:0] pixel_signed = $signed({1'b0, pixel_in});
 
-    // Explicit sign extension: Concatenate '0' to unsigned pixel prior to casting to signed
-    assign mult_result = $signed({1'b0, pixel_in}) * weight_in;
+    // ========================================================================
+    // Conditional Multiplier Generation
+    // Synthesizer will safely ignore attributes meant for other vendor tools
+    // ========================================================================
+    generate
+        if (USE_DSP == "NO") begin : gen_mult_logic
+            // Force synthesis into fabric logic (LUTs/ALMs)
+            (* multstyle = "logic" *)  // Intel Quartus attribute
+            (* use_dsp = "no" *)       // Xilinx Vivado attribute
+            wire signed [15:0] mult_logic_res;
+            
+            assign mult_logic_res = pixel_signed * weight_in;
+            assign mult_result    = mult_logic_res;
+            
+        end else begin : gen_mult_dsp
+            // Force synthesis into dedicated DSP blocks
+            (* multstyle = "dsp" *)    // Intel Quartus attribute
+            (* use_dsp = "yes" *)      // Xilinx Vivado attribute
+            wire signed [15:0] mult_dsp_res;
+            
+            assign mult_dsp_res = pixel_signed * weight_in;
+            assign mult_result  = mult_dsp_res;
+        end
+    endgenerate
 
-    // Pipelined output register stage to enable timing closure at high clock frequencies
+    // ========================================================================
+    // Pipelined Output Register
+    // Enables timing closure at high clock frequencies
+    // ========================================================================
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             product_out <= 16'sd0;

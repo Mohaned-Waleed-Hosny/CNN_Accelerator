@@ -79,18 +79,18 @@ module control_fsm #(
   // Total Datapath Lat = 6 cycles
   // We must delay the 'valid_window' signal by exactly 6 cycles.
 
-  reg [5:0] valid_pipeline;
+  reg [6:0] valid_pipeline; // Increased from [5:0] to [6:0]
 
   always @(posedge clk or negedge rst_n) begin
     if (!rst_n) begin
-      valid_pipeline <= 6'd0;
+      valid_pipeline <= 7'd0; // Update reset width
     end else begin
       // Shift register for the valid signal
-      valid_pipeline <= {valid_pipeline[4:0], valid_window};
+      valid_pipeline <= {valid_pipeline[5:0], valid_window}; // Update slice
     end
   end
 
   // The MSB of the pipeline is the final synchronized valid_out
-  assign valid_out = valid_pipeline[5];
+  assign valid_out = valid_pipeline[6]; // Change index to 6
 
 endmodule
