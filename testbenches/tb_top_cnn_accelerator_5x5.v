@@ -1,22 +1,30 @@
 `timescale 1ns / 1ps
 
-module tb_top_cnn_accelerator;
+module tb_top_cnn_accelerator_5x5;
 
-    localparam IMG_W = 8;
-    localparam IMG_H = 8;
-    localparam K_DIM = 3; // Parameterized testbench
-    localparam TOTAL_PIXELS = IMG_W * IMG_H;
-    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM-1)) * (IMG_H - (K_DIM-1));
+    // ------------------------------------------------------------------------
+    // Parameterization: 5x5 Kernel on a 10x10 Image
+    // ------------------------------------------------------------------------
+    localparam IMG_W = 10;
+    localparam IMG_H = 10;
+    localparam K_DIM = 5; 
+    localparam TOTAL_PIXELS = IMG_W * IMG_H; // 100 pixels
+    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM - 1)) * (IMG_H - (K_DIM - 1)); // 6 x 6 = 36 valid outputs
 
     reg         clk;
     reg         rst_n;
+    
+    // Configuration Ports
     reg         cfg_wr_en;
     reg  [1:0]  cfg_kernel_idx;
-    reg  [7:0]  cfg_weight_addr; // Widened to match new config
+    reg  [7:0]  cfg_weight_addr;
     reg  signed [7:0] cfg_weight_data;
     
+    // Operational Signals
     reg  [1:0]  active_kernel_sel;
     reg         relu_en;
+    
+    // Data Stream Ports
     reg         valid_in;
     reg  [7:0]  pixel_in;
     
@@ -26,12 +34,16 @@ module tb_top_cnn_accelerator;
     integer cycle_count;
     integer total_valid_outs;
     integer errors;
+    integer i;
 
+    // ------------------------------------------------------------------------
+    // Instantiate UUT with 5x5 Parameters
+    // ------------------------------------------------------------------------
     top_cnn_accelerator #(
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
         .KERNEL_DIM(K_DIM),
-        .USE_DSP("NO") // Test purely fabricated LUT synthesis
+        .USE_DSP("NO")
     ) uut (
         .clk(clk),
         .rst_n(rst_n),
@@ -47,8 +59,10 @@ module tb_top_cnn_accelerator;
         .pixel_out(pixel_out)
     );
 
+    // Clock Generation
     always #5 clk = ~clk;
 
+    // Output Monitor
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             total_valid_outs = 0;
@@ -59,6 +73,7 @@ module tb_top_cnn_accelerator;
         end
     end
 
+    // Task to program weight registers
     task write_weight(input [1:0] k_idx, input [7:0] addr, input signed [7:0] data);
         begin
             @(negedge clk);
@@ -71,7 +86,11 @@ module tb_top_cnn_accelerator;
         end
     endtask
 
+    // ------------------------------------------------------------------------
+    // Simulation Routine
+    // ------------------------------------------------------------------------
     initial begin
+        // Reset and initialization
         clk = 0; rst_n = 0; cycle_count = 0;
         cfg_wr_en = 0; cfg_kernel_idx = 0; cfg_weight_addr = 0; cfg_weight_data = 0;
         active_kernel_sel = 0; relu_en = 0;
@@ -81,17 +100,25 @@ module tb_top_cnn_accelerator;
         #15 rst_n = 1; #10;
 
         $display("==================================================");
-        $display("   Starting Top-Level CNN Accelerator Testbench   ");
+        $display("   Testing Parameterization: 5x5 Kernel on 10x10   ");
         $display("==================================================");
 
-        write_weight(0, 0, 8'd0); write_weight(0, 1, 8'd0); write_weight(0, 2, 8'd0);
-        write_weight(0, 3, 8'd0); write_weight(0, 4, 8'd2); write_weight(0, 5, 8'd0); 
-        write_weight(0, 6, 8'd0); write_weight(0, 7, 8'd0); write_weight(0, 8, 8'd0);
+        // Configure a 5x5 Identity Kernel (Center Weight = 2, All others = 0)
+        // Weight indices range from 0 to 24 (Center is index 12)
+        for (i = 0; i < K_DIM * K_DIM; i = i + 1) begin
+            if (i == 12) begin
+                write_weight(0, i, 8'd2); // Center pixel multiplier x2
+            end else begin
+                write_weight(0, i, 8'd0);
+            end
+        end
         
-        active_kernel_sel = 0; relu_en = 0;
+        active_kernel_sel = 0; 
+        relu_en = 0;
         
         @(negedge clk); @(negedge clk);
         
+        // Stream 100 Input Pixels (Linear values: 1, 2, 3... 100)
         cycle_count = 1;
         while (cycle_count <= TOTAL_PIXELS) begin
             valid_in = 1;
@@ -101,8 +128,10 @@ module tb_top_cnn_accelerator;
         end
         valid_in = 0;
 
-        repeat(20) @(posedge clk);
+        // Pipeline flush wait
+        repeat(30) @(posedge clk);
 
+        // Verification checks
         $display("==================================================");
         if (total_valid_outs !== EXPECTED_VALIDS) begin
             $display("[ERROR] Expected %0d valid outputs, but got %0d.", EXPECTED_VALIDS, total_valid_outs);
@@ -111,9 +140,10 @@ module tb_top_cnn_accelerator;
             $display("[SUCCESS] Correct number of output pixels generated (%0d).", EXPECTED_VALIDS);
         end
 
-        if (errors == 0) $display("   TEST PASSED SUCCESSFULLY!");
+        if (errors == 0) $display("   5x5 PARAMETERIZATION TEST PASSED SUCCESSFULLY!");
         else             $display("   TEST FAILED! Total errors: %0d", errors);
         $display("==================================================");
         $finish;
     end
+
 endmodule

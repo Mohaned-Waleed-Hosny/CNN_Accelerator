@@ -13,6 +13,6 @@
 
 vlib work
 vlog ../RTL/*.v ../testbenches/*.v
-vsim work.tb_top_cnn_accelerator
+vsim work.tb_top_cnn_accelerator_5x5
 add wave *
 run -all
