@@ -2,43 +2,35 @@
 
 module tb_top_cnn_accelerator_5x5;
 
-    // ------------------------------------------------------------------------
-    // Parameterization: 5x5 Kernel on a 10x10 Image
-    // ------------------------------------------------------------------------
     localparam IMG_W = 10;
     localparam IMG_H = 10;
     localparam K_DIM = 5; 
-    localparam TOTAL_PIXELS = IMG_W * IMG_H; // 100 pixels
-    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM - 1)) * (IMG_H - (K_DIM - 1)); // 6 x 6 = 36 valid outputs
+    localparam TOTAL_PIXELS = IMG_W * IMG_H;
+    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM - 1)) * (IMG_H - (K_DIM - 1));
 
     reg         clk;
     reg         rst_n;
     
-    // Configuration Ports
     reg         cfg_wr_en;
     reg  [1:0]  cfg_kernel_idx;
     reg  [7:0]  cfg_weight_addr;
     reg  signed [7:0] cfg_weight_data;
     
-    // Operational Signals
     reg  [1:0]  active_kernel_sel;
     reg         relu_en;
     
-    // Data Stream Ports
     reg         valid_in;
     reg  [7:0]  pixel_in;
     
     wire        valid_out;
     wire signed [15:0] pixel_out;
+    wire        kernel_ready; // Added kernel_ready wire
 
     integer cycle_count;
     integer total_valid_outs;
     integer errors;
     integer i;
 
-    // ------------------------------------------------------------------------
-    // Instantiate UUT with 5x5 Parameters
-    // ------------------------------------------------------------------------
     top_cnn_accelerator #(
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
@@ -56,13 +48,12 @@ module tb_top_cnn_accelerator_5x5;
         .valid_in(valid_in),
         .pixel_in(pixel_in),
         .valid_out(valid_out),
-        .pixel_out(pixel_out)
+        .pixel_out(pixel_out),
+        .kernel_ready(kernel_ready) // Connected kernel_ready port
     );
 
-    // Clock Generation
     always #5 clk = ~clk;
 
-    // Output Monitor
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             total_valid_outs = 0;
@@ -73,7 +64,6 @@ module tb_top_cnn_accelerator_5x5;
         end
     end
 
-    // Task to program weight registers
     task write_weight(input [1:0] k_idx, input [7:0] addr, input signed [7:0] data);
         begin
             @(negedge clk);
@@ -86,14 +76,13 @@ module tb_top_cnn_accelerator_5x5;
         end
     endtask
 
-    // ------------------------------------------------------------------------
-    // Simulation Routine
-    // ------------------------------------------------------------------------
     initial begin
-        // Reset and initialization
         clk = 0; rst_n = 0; cycle_count = 0;
         cfg_wr_en = 0; cfg_kernel_idx = 0; cfg_weight_addr = 0; cfg_weight_data = 0;
-        active_kernel_sel = 0; relu_en = 0;
+        
+        // 1. Initialize on unused bank so a switch to 0 triggers the loader FSM
+        active_kernel_sel = 2'b11; 
+        relu_en = 0;
         valid_in = 0; pixel_in = 0;
         errors = 0;
 
@@ -103,22 +92,27 @@ module tb_top_cnn_accelerator_5x5;
         $display("   Testing Parameterization: 5x5 Kernel on 10x10   ");
         $display("==================================================");
 
-        // Configure a 5x5 Identity Kernel (Center Weight = 2, All others = 0)
-        // Weight indices range from 0 to 24 (Center is index 12)
+        // Program 5x5 filter (25 weights), index 12 (center) = 2
         for (i = 0; i < K_DIM * K_DIM; i = i + 1) begin
             if (i == 12) begin
-                write_weight(0, i, 8'd2); // Center pixel multiplier x2
+                write_weight(0, i, 8'd2); 
             end else begin
                 write_weight(0, i, 8'd0);
             end
         end
         
-        active_kernel_sel = 0; 
+        // 2. Select Bank 0 to trigger sequential loading
+        @(negedge clk);
+        active_kernel_sel = 2'b00; 
         relu_en = 0;
         
-        @(negedge clk); @(negedge clk);
+        // 3. CRITICAL FIX: Wait for RTL to register the change and drop kernel_ready to 0
+        @(negedge clk);
         
-        // Stream 100 Input Pixels (Linear values: 1, 2, 3... 100)
+        // 4. Now safely wait for the loader to finish its 25-cycle copy
+        wait(kernel_ready == 1'b1);
+        @(negedge clk);
+        
         cycle_count = 1;
         while (cycle_count <= TOTAL_PIXELS) begin
             valid_in = 1;
@@ -128,10 +122,9 @@ module tb_top_cnn_accelerator_5x5;
         end
         valid_in = 0;
 
-        // Pipeline flush wait
+        // Flush 5-stage datapath pipeline
         repeat(30) @(posedge clk);
 
-        // Verification checks
         $display("==================================================");
         if (total_valid_outs !== EXPECTED_VALIDS) begin
             $display("[ERROR] Expected %0d valid outputs, but got %0d.", EXPECTED_VALIDS, total_valid_outs);

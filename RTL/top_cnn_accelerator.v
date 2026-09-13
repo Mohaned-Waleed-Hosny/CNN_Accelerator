@@ -44,8 +44,15 @@ module top_cnn_accelerator #(
     // The old formula (1 + GROUP_SIZE + ...) matched the old pe_array's
     // per-tap-registered chain, which is what caused GROUP_SIZE > 1 to
     // silently sum products from different clock cycles -- see pe_array.v.
+
+    // localparam CALC_LATENCY = 4;
+
     // --------------------------------------------------------------
-    localparam CALC_LATENCY = 4;
+    // all the above wrong
+    // --------------------------------------------------------------
+
+    // Correct pipeline depth: window_gen(1) + mac(1) + group-combine(1) + final-combine(1) + post_proc(1) = 5 cycles
+    localparam CALC_LATENCY = 5;
 
     kernel_config_regs #(
         .KERNEL_DIM(KERNEL_DIM),

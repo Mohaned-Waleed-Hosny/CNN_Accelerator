@@ -13,7 +13,9 @@ module pe_array #(
 );
 
     localparam NUM_MACS   = KERNEL_DIM * KERNEL_DIM;
-    localparam NUM_GROUPS = NUM_MACS / GROUP_SIZE;
+    
+    // FIX 1: Ceiling division ensures no MACs are left behind
+    localparam NUM_GROUPS = (NUM_MACS + GROUP_SIZE - 1) / GROUP_SIZE;
 
     wire signed [15:0] products [0:NUM_MACS-1];
 
@@ -30,41 +32,38 @@ module pe_array #(
         end
     endgenerate
 
-    // ------------------------------------------------------------------
-    // FIX: intra-group chain is now combinational (same cycle), so all
-    // GROUP_SIZE products in a group are summed from the SAME window
-    // sample. Only the group's final result is registered -- exactly
-    // one register stage per group, regardless of GROUP_SIZE. This is
-    // what lets Vivado map the chain onto a DSP48 cascade add without
-    // mixing products from different clock cycles.
-    // ------------------------------------------------------------------
     wire signed [19:0] group_partial [0:NUM_GROUPS-1];
 
     genvar gr;
     generate
         for (gr = 0; gr < NUM_GROUPS; gr = gr + 1) begin : gen_groups
-            reg signed [19:0] acc_c [0:GROUP_SIZE];
+            
+            // FIX 2: Dynamically calculate how many MACs belong to THIS specific group.
+            // The last group might be smaller than GROUP_SIZE.
+            localparam THIS_GROUP_SIZE = ((gr + 1) * GROUP_SIZE > NUM_MACS) ? 
+                                         (NUM_MACS - (gr * GROUP_SIZE)) : 
+                                         GROUP_SIZE;
+
+            reg signed [19:0] acc_c [0:THIS_GROUP_SIZE];
             integer s;
 
             always @(*) begin
                 acc_c[0] = 20'sd0;
-                for (s = 0; s < GROUP_SIZE; s = s + 1)
+                for (s = 0; s < THIS_GROUP_SIZE; s = s + 1)
+                    // Safely index without exceeding NUM_MACS
                     acc_c[s+1] = acc_c[s] + products[gr*GROUP_SIZE + s];
             end
 
             reg signed [19:0] group_partial_reg;
             always @(posedge clk or negedge rst_n) begin
                 if (!rst_n) group_partial_reg <= 20'sd0;
-                else        group_partial_reg <= acc_c[GROUP_SIZE];
+                else        group_partial_reg <= acc_c[THIS_GROUP_SIZE];
             end
 
             assign group_partial[gr] = group_partial_reg;
         end
     endgenerate
 
-    // ------------------------------------------------------------------
-    // Final combine: sum the small number of group partial results
-    // ------------------------------------------------------------------
     integer i;
     reg signed [19:0] next_sum;
     always @(*) begin
