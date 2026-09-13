@@ -4,7 +4,7 @@ module tb_top_cnn_accelerator;
 
     localparam IMG_W = 8;
     localparam IMG_H = 8;
-    localparam K_DIM = 3; // Parameterized testbench
+    localparam K_DIM = 3; 
     localparam TOTAL_PIXELS = IMG_W * IMG_H;
     localparam EXPECTED_VALIDS = (IMG_W - (K_DIM-1)) * (IMG_H - (K_DIM-1));
 
@@ -12,7 +12,7 @@ module tb_top_cnn_accelerator;
     reg         rst_n;
     reg         cfg_wr_en;
     reg  [1:0]  cfg_kernel_idx;
-    reg  [7:0]  cfg_weight_addr; // Widened to match new config
+    reg  [7:0]  cfg_weight_addr;
     reg  signed [7:0] cfg_weight_data;
     
     reg  [1:0]  active_kernel_sel;
@@ -22,6 +22,7 @@ module tb_top_cnn_accelerator;
     
     wire        valid_out;
     wire signed [15:0] pixel_out;
+    wire        kernel_ready; // Added kernel_ready wire
 
     integer cycle_count;
     integer total_valid_outs;
@@ -31,7 +32,7 @@ module tb_top_cnn_accelerator;
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
         .KERNEL_DIM(K_DIM),
-        .USE_DSP("NO") // Test purely fabricated LUT synthesis
+        .USE_DSP("NO") 
     ) uut (
         .clk(clk),
         .rst_n(rst_n),
@@ -44,7 +45,8 @@ module tb_top_cnn_accelerator;
         .valid_in(valid_in),
         .pixel_in(pixel_in),
         .valid_out(valid_out),
-        .pixel_out(pixel_out)
+        .pixel_out(pixel_out),
+        .kernel_ready(kernel_ready) // Connected kernel_ready port
     );
 
     always #5 clk = ~clk;
@@ -74,7 +76,8 @@ module tb_top_cnn_accelerator;
     initial begin
         clk = 0; rst_n = 0; cycle_count = 0;
         cfg_wr_en = 0; cfg_kernel_idx = 0; cfg_weight_addr = 0; cfg_weight_data = 0;
-        active_kernel_sel = 0; relu_en = 0;
+        active_kernel_sel = 2'b11; // 1. Start on unused bank so 0 triggers a change
+        relu_en = 0;
         valid_in = 0; pixel_in = 0;
         errors = 0;
 
@@ -84,13 +87,19 @@ module tb_top_cnn_accelerator;
         $display("   Starting Top-Level CNN Accelerator Testbench   ");
         $display("==================================================");
 
+        // 2. Program weights into configuration memory
         write_weight(0, 0, 8'd0); write_weight(0, 1, 8'd0); write_weight(0, 2, 8'd0);
         write_weight(0, 3, 8'd0); write_weight(0, 4, 8'd2); write_weight(0, 5, 8'd0); 
         write_weight(0, 6, 8'd0); write_weight(0, 7, 8'd0); write_weight(0, 8, 8'd0);
         
-        active_kernel_sel = 0; relu_en = 0;
+        // 3. Select Bank 0 to trigger sequential loading
+        @(negedge clk);
+        active_kernel_sel = 2'b00; 
+        relu_en = 0;
         
-        @(negedge clk); @(negedge clk);
+        // 4. Wait for sequential weight loader to finish copying memory to registers
+        wait(kernel_ready == 1'b1);
+        @(negedge clk);
         
         cycle_count = 1;
         while (cycle_count <= TOTAL_PIXELS) begin
@@ -101,7 +110,8 @@ module tb_top_cnn_accelerator;
         end
         valid_in = 0;
 
-        repeat(20) @(posedge clk);
+        // Flush pipeline
+        repeat(30) @(posedge clk);
 
         $display("==================================================");
         if (total_valid_outs !== EXPECTED_VALIDS) begin
