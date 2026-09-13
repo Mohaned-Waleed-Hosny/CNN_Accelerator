@@ -11,7 +11,8 @@ module mac_unit #(
 );
 
     wire signed [15:0] mult_result;
-    wire signed [9:0] pixel_signed = $signed({2'b00, pixel_in}); // Padded safely
+    // Single zero-bit padding for exact 9-bit signed conversion
+    wire signed [8:0]  pixel_signed = $signed({1'b0, pixel_in}); 
 
     generate
         if (USE_DSP == "NO") begin : gen_mult_logic

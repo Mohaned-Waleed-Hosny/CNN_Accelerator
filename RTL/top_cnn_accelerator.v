@@ -5,91 +5,89 @@ module top_cnn_accelerator #(
     parameter IMAGE_HEIGHT = 32,
     parameter KERNEL_DIM   = 3,
     parameter NUM_KERNELS  = 4,
-    parameter USE_DSP      = "YES" // Now accessible at top-level
+    parameter USE_DSP      = "YES",
+    parameter GROUP_SIZE   = 3     // Purely a synthesis/resource-mapping choice now
+                                    // (1, 3, or 9 all give identical, correct results
+                                    // -- see pe_array.v). Larger GROUP_SIZE pushes more
+                                    // adds into the per-group chain (good DSP48-cascade
+                                    // candidate); GROUP_SIZE=1 keeps a shallow, balanced
+                                    // final adder tree instead (good LUT-only candidate).
 )(
     input  wire         clk,
     input  wire         rst_n,
-
-    // Configuration
     input  wire         cfg_wr_en,
     input  wire [1:0]   cfg_kernel_idx,
     input  wire [7:0]   cfg_weight_addr,
     input  wire signed [7:0] cfg_weight_data,
-    
-    // Operation
     input  wire [1:0]   active_kernel_sel,
     input  wire         relu_en,
-    
-    // Input Stream
     input  wire         valid_in,
     input  wire [7:0]   pixel_in,
-
-    // Output Stream
     output wire         valid_out,
-    output wire signed [15:0] pixel_out
+    output wire signed [15:0] pixel_out,
+    output wire         kernel_ready   // exposed so a testbench/downstream block can
+                                        // gate on real readiness instead of counting
+                                        // fixed cycles after a kernel-bank switch
 );
 
     wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat;
     wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] window_flat;
-    
     wire shift_en;
     wire signed [19:0] raw_sum;
+
+    // --------------------------------------------------------------
+    // Fixed pipeline depth: mac(1) + group-combine(1) + final-combine(1)
+    // + post_proc(1) = 4 cycles, ALWAYS -- independent of GROUP_SIZE.
+    // This only holds with the corrected pe_array.v, where each group's
+    // internal chain is combinational and only the group's final sum is
+    // registered (one register per group, regardless of GROUP_SIZE).
+    // The old formula (1 + GROUP_SIZE + ...) matched the old pe_array's
+    // per-tap-registered chain, which is what caused GROUP_SIZE > 1 to
+    // silently sum products from different clock cycles -- see pe_array.v.
+    // --------------------------------------------------------------
+    localparam CALC_LATENCY = 4;
 
     kernel_config_regs #(
         .KERNEL_DIM(KERNEL_DIM),
         .NUM_KERNELS(NUM_KERNELS)
     ) u_kernel_config (
-        .clk(clk),
-        .rst_n(rst_n),
-        .wr_en(cfg_wr_en),
-        .kernel_idx(cfg_kernel_idx),
-        .weight_addr(cfg_weight_addr),
-        .weight_data_in(cfg_weight_data),
-        .active_kernel_sel(active_kernel_sel),
-        .active_weights_flat(active_weights_flat)
+        .clk(clk), .rst_n(rst_n), .wr_en(cfg_wr_en),
+        .kernel_idx(cfg_kernel_idx), .weight_addr(cfg_weight_addr),
+        .weight_data_in(cfg_weight_data), .active_kernel_sel(active_kernel_sel),
+        .active_weights_flat(active_weights_flat),
+        .kernel_ready(kernel_ready)
     );
 
     control_fsm #(
         .IMAGE_WIDTH(IMAGE_WIDTH),
         .IMAGE_HEIGHT(IMAGE_HEIGHT),
         .KERNEL_DIM(KERNEL_DIM),
-        .DATAPATH_LATENCY(4) // 1 MAC, 1 PE Add, 1 PostProc
+        .DATAPATH_LATENCY(CALC_LATENCY)
     ) u_control_fsm (
-        .clk(clk),
-        .rst_n(rst_n),
-        .valid_in(valid_in),
-        .shift_en(shift_en),
-        .valid_out(valid_out)
+        .clk(clk), .rst_n(rst_n), .valid_in(valid_in),
+        .shift_en(shift_en), .valid_out(valid_out)
     );
 
     window_generator #(
         .IMAGE_WIDTH(IMAGE_WIDTH),
         .KERNEL_DIM(KERNEL_DIM)
     ) u_window_gen (
-        .clk(clk),
-        .rst_n(rst_n),
-        .shift_en(shift_en),
-        .pixel_in(pixel_in),
-        .window_flat(window_flat)
+        .clk(clk), .rst_n(rst_n), .shift_en(shift_en),
+        .pixel_in(pixel_in), .window_flat(window_flat)
     );
 
     pe_array #(
         .KERNEL_DIM(KERNEL_DIM),
-        .USE_DSP(USE_DSP)
+        .USE_DSP(USE_DSP),
+        .GROUP_SIZE(GROUP_SIZE)
     ) u_pe_array (
-        .clk(clk),
-        .rst_n(rst_n),
-        .window_flat(window_flat),
-        .active_weights_flat(active_weights_flat),
-        .raw_sum(raw_sum)
+        .clk(clk), .rst_n(rst_n), .window_flat(window_flat),
+        .active_weights_flat(active_weights_flat), .raw_sum(raw_sum)
     );
 
     post_processing u_post_proc (
-        .clk(clk),
-        .rst_n(rst_n),
-        .relu_en(relu_en),
-        .raw_sum(raw_sum),
-        .pixel_out(pixel_out)
+        .clk(clk), .rst_n(rst_n), .relu_en(relu_en),
+        .raw_sum(raw_sum), .pixel_out(pixel_out)
     );
 
 endmodule
