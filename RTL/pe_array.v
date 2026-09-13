@@ -1,25 +1,22 @@
 `timescale 1ns / 1ps
 
 module pe_array #(
-    parameter KERNEL_DIM = 3,
-    parameter USE_DSP    = "YES"
+    parameter KERNEL_DIM  = 3,
+    parameter USE_DSP     = "YES",
+    parameter GROUP_SIZE  = 3
 )(
     input  wire clk,
     input  wire rst_n,
-    
-    // Flattened Ports
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] window_flat,
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat,
-    
     output reg  signed [19:0] raw_sum
 );
 
-    localparam NUM_MACS = KERNEL_DIM * KERNEL_DIM;
+    localparam NUM_MACS   = KERNEL_DIM * KERNEL_DIM;
+    localparam NUM_GROUPS = NUM_MACS / GROUP_SIZE;
 
-    // Array of outputs from all MACs
     wire signed [15:0] products [0:NUM_MACS-1];
 
-    // Instantiate Parameterized MACs
     genvar g;
     generate
         for (g = 0; g < NUM_MACS; g = g + 1) begin : gen_macs
@@ -33,24 +30,53 @@ module pe_array #(
         end
     endgenerate
 
-    // Parameterized Summation (1 Pipeline Stage for Accumulation)
-    // Synthesis tools will map this combinatorial loop to adder trees/cascades automatically.
+    // ------------------------------------------------------------------
+    // FIX: intra-group chain is now combinational (same cycle), so all
+    // GROUP_SIZE products in a group are summed from the SAME window
+    // sample. Only the group's final result is registered -- exactly
+    // one register stage per group, regardless of GROUP_SIZE. This is
+    // what lets Vivado map the chain onto a DSP48 cascade add without
+    // mixing products from different clock cycles.
+    // ------------------------------------------------------------------
+    wire signed [19:0] group_partial [0:NUM_GROUPS-1];
+
+    genvar gr;
+    generate
+        for (gr = 0; gr < NUM_GROUPS; gr = gr + 1) begin : gen_groups
+            reg signed [19:0] acc_c [0:GROUP_SIZE];
+            integer s;
+
+            always @(*) begin
+                acc_c[0] = 20'sd0;
+                for (s = 0; s < GROUP_SIZE; s = s + 1)
+                    acc_c[s+1] = acc_c[s] + products[gr*GROUP_SIZE + s];
+            end
+
+            reg signed [19:0] group_partial_reg;
+            always @(posedge clk or negedge rst_n) begin
+                if (!rst_n) group_partial_reg <= 20'sd0;
+                else        group_partial_reg <= acc_c[GROUP_SIZE];
+            end
+
+            assign group_partial[gr] = group_partial_reg;
+        end
+    endgenerate
+
+    // ------------------------------------------------------------------
+    // Final combine: sum the small number of group partial results
+    // ------------------------------------------------------------------
     integer i;
     reg signed [19:0] next_sum;
-
     always @(*) begin
         next_sum = 20'sd0;
-        for (i = 0; i < NUM_MACS; i = i + 1) begin
-            next_sum = next_sum + products[i];
+        for (i = 0; i < NUM_GROUPS; i = i + 1) begin
+            next_sum = next_sum + group_partial[i];
         end
     end
 
     always @(posedge clk or negedge rst_n) begin
-        if (!rst_n) begin
-            raw_sum <= 20'sd0;
-        end else begin
-            raw_sum <= next_sum;
-        end
+        if (!rst_n) raw_sum <= 20'sd0;
+        else        raw_sum <= next_sum;
     end
 
 endmodule
