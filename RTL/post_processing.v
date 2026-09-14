@@ -3,6 +3,7 @@
 module post_processing (
     input  wire               clk,
     input  wire               rst_n,
+    input  wire               shift_en,   // ADDED: Clock gating control signal
     input  wire               relu_en,    
     input  wire signed [19:0] raw_sum,    
     output reg  signed [15:0] pixel_out   
@@ -27,7 +28,7 @@ module post_processing (
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             pixel_out <= 16'sd0;
-        end else begin
+        end else if (shift_en) begin      // ADDED: Conditionally toggle register updates
             if (relu_en && saturated_sum[15]) begin
                 pixel_out <= 16'sd0;
             end else begin

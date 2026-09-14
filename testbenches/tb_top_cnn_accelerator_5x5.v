@@ -35,7 +35,7 @@ module tb_top_cnn_accelerator_5x5;
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
         .KERNEL_DIM(K_DIM),
-        .USE_DSP("NO")
+        .USE_DSP("YES")
     ) uut (
         .clk(clk),
         .rst_n(rst_n),

@@ -4,7 +4,8 @@ module mac_unit #(
     parameter USE_DSP = "YES"
 )(
     input  wire              clk,          
-    input  wire              rst_n,        
+    input  wire              rst_n,
+    input  wire              shift_en,     // ADDED: Clock gating control signal
     input  wire [7:0]        pixel_in,     
     input  wire signed [7:0] weight_in,    
     output reg  signed [15:0] product_out  
@@ -31,7 +32,7 @@ module mac_unit #(
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             product_out <= 16'sd0;
-        end else begin
+        end else if (shift_en) begin       // ADDED: Register update conditionally toggled
             product_out <= mult_result;
         end
     end
