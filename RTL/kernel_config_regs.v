@@ -49,7 +49,9 @@ module kernel_config_regs #(
             kernel_ready <= 1'b0;
             last_sel     <= active_kernel_sel;
         end else if (loading) begin
-            active_weights_flat[(load_idx*8) +: 8] <= weight_mem[rd_addr];
+            // Shift-register loading: prepends new weight byte and shifts right by 8 bits.
+            // Eliminates dynamic demux steering logic across active_weights_flat.
+            active_weights_flat <= {weight_mem[rd_addr], active_weights_flat} >> 8;
             if (load_idx == NUM_WEIGHTS-1) begin
                 loading         <= 1'b0;
                 kernel_ready    <= 1'b1;
