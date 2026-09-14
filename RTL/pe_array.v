@@ -7,15 +7,13 @@ module pe_array #(
 )(
     input  wire clk,
     input  wire rst_n,
-    input  wire shift_en,                 // ADDED: Clock gating control signal
+    input  wire shift_en,
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] window_flat,
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat,
     output reg  signed [19:0] raw_sum
 );
 
     localparam NUM_MACS   = KERNEL_DIM * KERNEL_DIM;
-    
-    // FIX 1: Ceiling division ensures no MACs are left behind
     localparam NUM_GROUPS = (NUM_MACS + GROUP_SIZE - 1) / GROUP_SIZE;
 
     wire signed [15:0] products [0:NUM_MACS-1];
@@ -26,7 +24,7 @@ module pe_array #(
             mac_unit #(.USE_DSP(USE_DSP)) u_mac (
                 .clk(clk),
                 .rst_n(rst_n),
-                .shift_en(shift_en),      // ADDED: Pass shift_en to datapath registers
+                .shift_en(shift_en),
                 .pixel_in(window_flat[(g*8) +: 8]),
                 .weight_in(active_weights_flat[(g*8) +: 8]),
                 .product_out(products[g])
@@ -39,9 +37,6 @@ module pe_array #(
     genvar gr;
     generate
         for (gr = 0; gr < NUM_GROUPS; gr = gr + 1) begin : gen_groups
-            
-            // FIX 2: Dynamically calculate how many MACs belong to THIS specific group.
-            // The last group might be smaller than GROUP_SIZE.
             localparam THIS_GROUP_SIZE = ((gr + 1) * GROUP_SIZE > NUM_MACS) ? 
                                          (NUM_MACS - (gr * GROUP_SIZE)) : 
                                          GROUP_SIZE;
@@ -52,14 +47,13 @@ module pe_array #(
             always @(*) begin
                 acc_c[0] = 20'sd0;
                 for (s = 0; s < THIS_GROUP_SIZE; s = s + 1)
-                    // Safely index without exceeding NUM_MACS
                     acc_c[s+1] = acc_c[s] + products[gr*GROUP_SIZE + s];
             end
 
             reg signed [19:0] group_partial_reg;
             always @(posedge clk or negedge rst_n) begin
                 if (!rst_n) group_partial_reg <= 20'sd0;
-                else if (shift_en) group_partial_reg <= acc_c[THIS_GROUP_SIZE]; // ADDED: Conditionally toggle
+                else if (shift_en) group_partial_reg <= acc_c[THIS_GROUP_SIZE];
             end
 
             assign group_partial[gr] = group_partial_reg;
@@ -77,7 +71,7 @@ module pe_array #(
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) raw_sum <= 20'sd0;
-        else if (shift_en) raw_sum <= next_sum; // ADDED: Conditionally toggle
+        else if (shift_en) raw_sum <= next_sum;
     end
 
 endmodule
