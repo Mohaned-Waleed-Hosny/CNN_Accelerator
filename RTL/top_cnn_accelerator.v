@@ -17,7 +17,10 @@ module top_cnn_accelerator #(
     input  wire         rst_n,
     input  wire         cfg_wr_en,
     input  wire [1:0]   cfg_kernel_idx,
-    input  wire [7:0]   cfg_weight_addr,
+    input  wire [3:0]   cfg_weight_addr, // WIDTH OPTIMIZATION: narrowed from [7:0]
+                                          // to match kernel_config_regs.v's
+                                          // narrowed weight_addr port (4 bits is
+                                          // exactly enough to address 9 weights).
     input  wire signed [7:0] cfg_weight_data,
     input  wire [1:0]   active_kernel_sel,
     input  wire         relu_en,

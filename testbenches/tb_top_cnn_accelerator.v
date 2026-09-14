@@ -12,7 +12,10 @@ module tb_top_cnn_accelerator;
     reg         rst_n;
     reg         cfg_wr_en;
     reg  [1:0]  cfg_kernel_idx;
-    reg  [7:0]  cfg_weight_addr;
+    reg  [3:0]  cfg_weight_addr; // WIDTH OPTIMIZATION: narrowed from [7:0] to
+                                  // [3:0] to match top_cnn_accelerator.v's
+                                  // narrowed cfg_weight_addr port (9 weights
+                                  // only need 4 address bits).
     reg  signed [7:0] cfg_weight_data;
     
     reg  [1:0]  active_kernel_sel;
@@ -32,7 +35,7 @@ module tb_top_cnn_accelerator;
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
         .KERNEL_DIM(K_DIM),
-        .USE_DSP("NO") 
+        .USE_DSP("YES") 
     ) uut (
         .clk(clk),
         .rst_n(rst_n),
@@ -61,7 +64,7 @@ module tb_top_cnn_accelerator;
         end
     end
 
-    task write_weight(input [1:0] k_idx, input [7:0] addr, input signed [7:0] data);
+    task write_weight(input [1:0] k_idx, input [3:0] addr, input signed [7:0] data);
         begin
             @(negedge clk);
             cfg_wr_en = 1;
