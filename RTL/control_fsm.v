@@ -15,31 +15,34 @@ module control_fsm #(
 
     assign shift_en = valid_in;
 
-    localparam TOTAL_PIXELS = IMAGE_WIDTH * IMAGE_HEIGHT;
-    localparam CNT_WIDTH    = (TOTAL_PIXELS > 1) ? $clog2(TOTAL_PIXELS) : 1;
-    localparam COL_WIDTH    = (IMAGE_WIDTH > 1) ? $clog2(IMAGE_WIDTH) : 1;
+    // Explicit 2D Counters replacing Modulo/Division logic
+    localparam COL_WIDTH = (IMAGE_WIDTH > 1)  ? $clog2(IMAGE_WIDTH)  : 1;
+    localparam ROW_WIDTH = (IMAGE_HEIGHT > 1) ? $clog2(IMAGE_HEIGHT) : 1;
 
-    reg [CNT_WIDTH-1:0] pixel_cnt;
+    reg [COL_WIDTH-1:0] col_cnt;
+    reg [ROW_WIDTH-1:0] row_cnt;
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
-            pixel_cnt <= {CNT_WIDTH{1'b0}};
+            col_cnt <= {COL_WIDTH{1'b0}};
+            row_cnt <= {ROW_WIDTH{1'b0}};
         end else if (valid_in) begin
-            if (pixel_cnt == TOTAL_PIXELS - 1) begin
-                pixel_cnt <= {CNT_WIDTH{1'b0}};
+            if (col_cnt == IMAGE_WIDTH - 1) begin
+                col_cnt <= {COL_WIDTH{1'b0}};
+                if (row_cnt == IMAGE_HEIGHT - 1) begin
+                    row_cnt <= {ROW_WIDTH{1'b0}};
+                end else begin
+                    row_cnt <= row_cnt + 1'b1;
+                end
             end else begin
-                pixel_cnt <= pixel_cnt + 1'b1;
+                col_cnt <= col_cnt + 1'b1;
             end
         end
     end
 
-    wire [COL_WIDTH-1:0] col_cnt = pixel_cnt % IMAGE_WIDTH;
-    wire [CNT_WIDTH-1:0] row_cnt = pixel_cnt / IMAGE_WIDTH;
-
-    wire valid_window;
-    assign valid_window = valid_in && 
-                          (col_cnt >= KERNEL_DIM - 1) && 
-                          (row_cnt >= KERNEL_DIM - 1);
+    wire valid_window = valid_in && 
+                        (col_cnt >= KERNEL_DIM - 1) && 
+                        (row_cnt >= KERNEL_DIM - 1);
 
     reg [DATAPATH_LATENCY-1:0] valid_pipeline;
 
