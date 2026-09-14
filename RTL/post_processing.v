@@ -8,21 +8,14 @@ module post_processing (
     output reg  signed [15:0] pixel_out   
 );
 
-    // WIDTH/LOGIC OPTIMIZATION: a 20-bit signed value fits in 16 bits signed
-    // exactly when its top 5 bits (raw_sum[19:15]) all equal the sign bit
-    // (raw_sum[15]) -- i.e. the extra guard bits carry no real magnitude
-    // information beyond what the 16-bit field already holds. This replaces
-    // two full 20-bit magnitude comparisons (raw_sum > MAX, raw_sum < MIN)
-    // with a single small equality/uniformity check, which is typically
-    // cheaper in LUTs while being logically equivalent for detecting
-    // whether raw_sum is in the representable 16-bit signed range.
-    wire in_range = (raw_sum[19:15] == {5{raw_sum[15]}});
+    localparam signed [19:0] MAX_16BIT = 20'sd32767;
+    localparam signed [19:0] MIN_16BIT = -20'sd32768;
 
     wire signed [15:0] saturated_sum;
 
-    assign saturated_sum = in_range   ? raw_sum[15:0] :
-                           raw_sum[19] ? -16'sd32768   : // sign bit set -> negative overflow
-                                          16'sd32767;    // sign bit clear -> positive overflow
+    assign saturated_sum = (raw_sum > MAX_16BIT) ? 16'sd32767 :  
+                           (raw_sum < MIN_16BIT) ? -16'sd32768 : 
+                           raw_sum[15:0];                        
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
