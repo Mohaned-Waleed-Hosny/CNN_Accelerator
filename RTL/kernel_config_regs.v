@@ -8,16 +8,11 @@ module kernel_config_regs #(
     input  wire         rst_n,
     input  wire         wr_en,
     input  wire [1:0]   kernel_idx,
-    input  wire [3:0]   weight_addr, // WIDTH OPTIMIZATION: narrowed from [7:0] to
-                                      // [3:0] -- only 9 weights (indices 0-8) ever
-                                      // need addressing, which needs exactly
-                                      // WORD_ADDR_BITS=$clog2(9)=4 bits. The upper
-                                      // 4 bits were always zero/unused, carrying
-                                      // dead comparator and routing logic.
+    input  wire [3:0]   weight_addr,
     input  wire signed [7:0] weight_data_in,
     input  wire [1:0]   active_kernel_sel,
     output reg  [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat,
-    output reg           kernel_ready   // high once the active bank has finished loading
+    output reg           kernel_ready
 );
     localparam NUM_WEIGHTS    = KERNEL_DIM * KERNEL_DIM;
     localparam WORD_ADDR_BITS = $clog2(NUM_WEIGHTS);
@@ -26,14 +21,12 @@ module kernel_config_regs #(
 
     reg signed [7:0] weight_mem [0:MEM_DEPTH-1];
 
-    // ---- Write port (configuration time only) ----
     wire [BANK_ADDR_BITS+WORD_ADDR_BITS-1:0] wr_addr = {kernel_idx, weight_addr[WORD_ADDR_BITS-1:0]};
     always @(posedge clk) begin
         if (wr_en && weight_addr < NUM_WEIGHTS)
             weight_mem[wr_addr] <= weight_data_in;
     end
 
-    // ---- Sequential loader: ONE read port, reused across 9 cycles ----
     reg [1:0] last_sel;
     reg [WORD_ADDR_BITS-1:0] load_idx;
     reg loading;

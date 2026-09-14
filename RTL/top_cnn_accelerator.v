@@ -6,21 +6,13 @@ module top_cnn_accelerator #(
     parameter KERNEL_DIM   = 3,
     parameter NUM_KERNELS  = 4,
     parameter USE_DSP      = "YES",
-    parameter GROUP_SIZE   = 3     // Purely a synthesis/resource-mapping choice now
-                                    // (1, 3, or 9 all give identical, correct results
-                                    // -- see pe_array.v). Larger GROUP_SIZE pushes more
-                                    // adds into the per-group chain (good DSP48-cascade
-                                    // candidate); GROUP_SIZE=1 keeps a shallow, balanced
-                                    // final adder tree instead (good LUT-only candidate).
+    parameter GROUP_SIZE   = 3
 )(
     input  wire         clk,
     input  wire         rst_n,
     input  wire         cfg_wr_en,
     input  wire [1:0]   cfg_kernel_idx,
-    input  wire [3:0]   cfg_weight_addr, // WIDTH OPTIMIZATION: narrowed from [7:0]
-                                          // to match kernel_config_regs.v's
-                                          // narrowed weight_addr port (4 bits is
-                                          // exactly enough to address 9 weights).
+    input  wire [3:0]   cfg_weight_addr,
     input  wire signed [7:0] cfg_weight_data,
     input  wire [1:0]   active_kernel_sel,
     input  wire         relu_en,
@@ -28,9 +20,7 @@ module top_cnn_accelerator #(
     input  wire [7:0]   pixel_in,
     output wire         valid_out,
     output wire signed [15:0] pixel_out,
-    output wire         kernel_ready   // exposed so a testbench/downstream block can
-                                        // gate on real readiness instead of counting
-                                        // fixed cycles after a kernel-bank switch
+    output wire         kernel_ready
 );
 
     wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat;
@@ -38,23 +28,6 @@ module top_cnn_accelerator #(
     wire shift_en;
     wire signed [19:0] raw_sum;
 
-    // --------------------------------------------------------------
-    // Fixed pipeline depth: mac(1) + group-combine(1) + final-combine(1)
-    // + post_proc(1) = 4 cycles, ALWAYS -- independent of GROUP_SIZE.
-    // This only holds with the corrected pe_array.v, where each group's
-    // internal chain is combinational and only the group's final sum is
-    // registered (one register per group, regardless of GROUP_SIZE).
-    // The old formula (1 + GROUP_SIZE + ...) matched the old pe_array's
-    // per-tap-registered chain, which is what caused GROUP_SIZE > 1 to
-    // silently sum products from different clock cycles -- see pe_array.v.
-
-    // localparam CALC_LATENCY = 4;
-
-    // --------------------------------------------------------------
-    // all the above wrong
-    // --------------------------------------------------------------
-
-    // Correct pipeline depth: window_gen(1) + mac(1) + group-combine(1) + final-combine(1) + post_proc(1) = 5 cycles
     localparam CALC_LATENCY = 5;
 
     kernel_config_regs #(
@@ -91,13 +64,13 @@ module top_cnn_accelerator #(
         .USE_DSP(USE_DSP),
         .GROUP_SIZE(GROUP_SIZE)
     ) u_pe_array (
-        .clk(clk), .rst_n(rst_n), .shift_en(shift_en), // ADDED: Mapped shift_en from control FSM
+        .clk(clk), .rst_n(rst_n), .shift_en(shift_en),
         .window_flat(window_flat),
         .active_weights_flat(active_weights_flat), .raw_sum(raw_sum)
     );
 
     post_processing u_post_proc (
-        .clk(clk), .rst_n(rst_n), .shift_en(shift_en), // ADDED: Mapped shift_en from control FSM
+        .clk(clk), .rst_n(rst_n), .shift_en(shift_en),
         .relu_en(relu_en),
         .raw_sum(raw_sum), .pixel_out(pixel_out)
     );

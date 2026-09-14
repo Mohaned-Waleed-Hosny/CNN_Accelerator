@@ -5,14 +5,13 @@ module mac_unit #(
 )(
     input  wire              clk,          
     input  wire              rst_n,
-    input  wire              shift_en,     // ADDED: Clock gating control signal
+    input  wire              shift_en,
     input  wire [7:0]        pixel_in,     
     input  wire signed [7:0] weight_in,    
     output reg  signed [15:0] product_out  
 );
 
     wire signed [15:0] mult_result;
-    // Single zero-bit padding for exact 9-bit signed conversion
     wire signed [8:0]  pixel_signed = $signed({1'b0, pixel_in}); 
 
     generate
@@ -32,7 +31,7 @@ module mac_unit #(
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             product_out <= 16'sd0;
-        end else if (shift_en) begin       // ADDED: Register update conditionally toggled
+        end else if (shift_en) begin
             product_out <= mult_result;
         end
     end

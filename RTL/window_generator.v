@@ -31,7 +31,6 @@ module window_generator #(
         end
     end
 
-    // Omitted reset logic allows clean register packing and SRL inference
     always @(posedge clk) begin
         if (shift_en) begin
             for (r = 0; r < KERNEL_DIM; r = r + 1) begin
@@ -41,7 +40,7 @@ module window_generator #(
             end
             
             window_grid[KERNEL_DIM-1][KERNEL_DIM-1] <= pixel_in;
-            for (r = 0; r < KERNEL_DIM-1; r = r + 1) begin
+            for (r = 1; r < KERNEL_DIM-1; r = r + 1) begin
                 window_grid[r][KERNEL_DIM-1] <= line_buf[KERNEL_DIM-2-r][IMAGE_WIDTH-1];
             end
         end
