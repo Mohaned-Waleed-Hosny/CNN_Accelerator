@@ -91,12 +91,14 @@ module top_cnn_accelerator #(
         .USE_DSP(USE_DSP),
         .GROUP_SIZE(GROUP_SIZE)
     ) u_pe_array (
-        .clk(clk), .rst_n(rst_n), .window_flat(window_flat),
+        .clk(clk), .rst_n(rst_n), .shift_en(shift_en), // ADDED: Mapped shift_en from control FSM
+        .window_flat(window_flat),
         .active_weights_flat(active_weights_flat), .raw_sum(raw_sum)
     );
 
     post_processing u_post_proc (
-        .clk(clk), .rst_n(rst_n), .relu_en(relu_en),
+        .clk(clk), .rst_n(rst_n), .shift_en(shift_en), // ADDED: Mapped shift_en from control FSM
+        .relu_en(relu_en),
         .raw_sum(raw_sum), .pixel_out(pixel_out)
     );
 

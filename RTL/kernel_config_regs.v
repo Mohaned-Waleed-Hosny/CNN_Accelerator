@@ -1,3 +1,5 @@
+`timescale 1ns / 1ps
+
 module kernel_config_regs #(
     parameter KERNEL_DIM  = 3,
     parameter NUM_KERNELS = 4

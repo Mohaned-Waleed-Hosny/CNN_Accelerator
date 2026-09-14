@@ -7,6 +7,7 @@ module pe_array #(
 )(
     input  wire clk,
     input  wire rst_n,
+    input  wire shift_en,                 // ADDED: Clock gating control signal
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] window_flat,
     input  wire [(KERNEL_DIM*KERNEL_DIM*8)-1:0] active_weights_flat,
     output reg  signed [19:0] raw_sum
@@ -25,6 +26,7 @@ module pe_array #(
             mac_unit #(.USE_DSP(USE_DSP)) u_mac (
                 .clk(clk),
                 .rst_n(rst_n),
+                .shift_en(shift_en),      // ADDED: Pass shift_en to datapath registers
                 .pixel_in(window_flat[(g*8) +: 8]),
                 .weight_in(active_weights_flat[(g*8) +: 8]),
                 .product_out(products[g])
@@ -57,7 +59,7 @@ module pe_array #(
             reg signed [19:0] group_partial_reg;
             always @(posedge clk or negedge rst_n) begin
                 if (!rst_n) group_partial_reg <= 20'sd0;
-                else        group_partial_reg <= acc_c[THIS_GROUP_SIZE];
+                else if (shift_en) group_partial_reg <= acc_c[THIS_GROUP_SIZE]; // ADDED: Conditionally toggle
             end
 
             assign group_partial[gr] = group_partial_reg;
@@ -75,7 +77,7 @@ module pe_array #(
 
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) raw_sum <= 20'sd0;
-        else        raw_sum <= next_sum;
+        else if (shift_en) raw_sum <= next_sum; // ADDED: Conditionally toggle
     end
 
 endmodule
