@@ -455,7 +455,7 @@ Per instruction 4 of the competition brief, the assumptions made in this design 
 
 ## License
 
-Not yet specified. Add a `LICENSE` file if you intend to make the repository public.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
