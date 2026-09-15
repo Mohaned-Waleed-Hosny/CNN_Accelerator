@@ -11,18 +11,18 @@ fprintf('   SSCS 2026 Accelerator Golden Model Verification  \n');
 fprintf('====================================================\n\n');
 
 % --- 1. Design & Simulation Parameters ---
-img_w   = 10;
-img_h   = 10;
-k_dim   = 5;
+img_w   = 8;
+img_h   = 8;
+k_dim   = 3;
 relu_en = false; % Set to true to enable ReLU activation
 
-% --- 2. Input Image Generation (10x10 Grayscale Stream: 1 to 100) ---
-input_1D    = uint8(1:100);
+% --- 2. Input Image Generation (8x8 Grayscale Stream: 1 to 64) ---
+input_1D    = uint8(1:64);
 input_image = reshape(input_1D, img_w, img_h)'; % Matrix format (row-major)
 
-% --- 3. Kernel Configuration (5x5 Center-Weighted Identity Filter) ---
+% --- 3. Kernel Configuration (3x3 Center-Weighted Identity Filter) ---
 kernel      = zeros(k_dim, k_dim, 'int8');
-kernel(3,3) = int8(2); % Scale center pixel by 2
+kernel(2,2) = int8(2); % Scale center pixel by 2
 
 % --- 4. Execute Golden Reference Model ---
 [output_stream, output_map] = cnn_accelerator_golden_model(input_image, kernel, relu_en);
@@ -68,8 +68,8 @@ tiledlayout(2,2, 'TileSpacing', 'compact', 'Padding', 'compact');
 
 % Subplot configuration matrix: {Data, Title, Colormap}
 m_plots = {
-    input_image,   '1. Input Image (10x10, 8-bit)',      'gray';
-    double(kernel),'2. Kernel Weights (5x5, 8-bit)',     'bone';
+    input_image,   '1. Input Image (8x8, 8-bit)',        'gray';
+    double(kernel),'2. Kernel Weights (3x3, 8-bit)',     'bone';
     output_map,    '3. Output Feature Map (6x6, 16-bit)','parula'
 };
 

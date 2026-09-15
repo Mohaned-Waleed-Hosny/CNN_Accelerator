@@ -1,38 +1,41 @@
 `timescale 1ns / 1ps
 
-module tb_top_cnn_accelerator;
+module tb_top_cnn_accelerator_4x4;
 
-    localparam IMG_W = 8;
-    localparam IMG_H = 8;
-    localparam K_DIM = 3; 
+    localparam IMG_W = 10;
+    localparam IMG_H = 10;
+    localparam K_DIM = 4; 
     localparam TOTAL_PIXELS = IMG_W * IMG_H;
-    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM-1)) * (IMG_H - (K_DIM-1));
+    localparam EXPECTED_VALIDS = (IMG_W - (K_DIM - 1)) * (IMG_H - (K_DIM - 1));
 
     reg         clk;
     reg         rst_n;
+    
     reg         cfg_wr_en;
     reg  [1:0]  cfg_kernel_idx;
-    reg  [3:0]  cfg_weight_addr; 
+    reg  [7:0]  cfg_weight_addr;
     reg  signed [7:0] cfg_weight_data;
     
     reg  [1:0]  active_kernel_sel;
     reg         relu_en;
+    
     reg         valid_in;
     reg  [7:0]  pixel_in;
     
     wire        valid_out;
     wire signed [15:0] pixel_out;
-    wire        kernel_ready; 
+    wire        kernel_ready; // Added kernel_ready wire
 
     integer cycle_count;
     integer total_valid_outs;
     integer errors;
+    integer i;
 
     top_cnn_accelerator #(
         .IMAGE_WIDTH(IMG_W),
         .IMAGE_HEIGHT(IMG_H),
         .KERNEL_DIM(K_DIM),
-        .USE_DSP("YES") 
+        .USE_DSP("YES")
     ) uut (
         .clk(clk),
         .rst_n(rst_n),
@@ -46,7 +49,7 @@ module tb_top_cnn_accelerator;
         .pixel_in(pixel_in),
         .valid_out(valid_out),
         .pixel_out(pixel_out),
-        .kernel_ready(kernel_ready) 
+        .kernel_ready(kernel_ready) // Connected kernel_ready port
     );
 
     always #5 clk = ~clk;
@@ -61,7 +64,7 @@ module tb_top_cnn_accelerator;
         end
     end
 
-    task write_weight(input [1:0] k_idx, input [3:0] addr, input signed [7:0] data);
+    task write_weight(input [1:0] k_idx, input [7:0] addr, input signed [7:0] data);
         begin
             @(negedge clk);
             cfg_wr_en = 1;
@@ -76,7 +79,9 @@ module tb_top_cnn_accelerator;
     initial begin
         clk = 0; rst_n = 0; cycle_count = 0;
         cfg_wr_en = 0; cfg_kernel_idx = 0; cfg_weight_addr = 0; cfg_weight_data = 0;
-        active_kernel_sel = 2'b11; // 1. Start on unused bank so 0 triggers a change
+        
+        // 1. Initialize on unused bank so a switch to 0 triggers the loader FSM
+        active_kernel_sel = 2'b11; 
         relu_en = 0;
         valid_in = 0; pixel_in = 0;
         errors = 0;
@@ -84,25 +89,27 @@ module tb_top_cnn_accelerator;
         #15 rst_n = 1; #10;
 
         $display("==================================================");
-        $display("   Starting Top-Level CNN Accelerator Testbench   ");
+        $display("   Testing Parameterization: 4x4 Kernel on 10x10   ");
         $display("==================================================");
 
-        // 2. Program weights into configuration memory
-        write_weight(0, 0, 8'd0); write_weight(0, 1, 8'd0); write_weight(0, 2, 8'd0);
-        write_weight(0, 3, 8'd0); write_weight(0, 4, 8'd2); write_weight(0, 5, 8'd0); 
-        write_weight(0, 6, 8'd0); write_weight(0, 7, 8'd0); write_weight(0, 8, 8'd0);
+        // Program 4x4 filter (16 weights), index 5 = 2 (near-center)
+        for (i = 0; i < K_DIM * K_DIM; i = i + 1) begin
+            if (i == 5) begin
+                write_weight(0, i, 8'd2); 
+            end else begin
+                write_weight(0, i, 8'd0);
+            end
+        end
         
-        // 3. Select Bank 0 to trigger sequential loading
+        // 2. Select Bank 0 to trigger sequential loading
         @(negedge clk);
         active_kernel_sel = 2'b00; 
         relu_en = 0;
         
-        // FIX: Give the FSM one clock cycle to recognize sel_changed and drop kernel_ready to 0.
-        // Without this, the testbench races past the wait() block because kernel_ready 
-        // is ALREADY 1 from the initial Bank 3 load out of reset.
+        // 3. CRITICAL FIX: Wait for RTL to register the change and drop kernel_ready to 0
         @(negedge clk);
         
-        // 4. Wait for sequential weight loader to finish copying memory to registers
+        // 4. Now safely wait for the loader to finish its 16-cycle copy
         wait(kernel_ready == 1'b1);
         @(negedge clk);
         
@@ -115,7 +122,7 @@ module tb_top_cnn_accelerator;
         end
         valid_in = 0;
 
-        // Flush pipeline
+        // Flush 5-stage datapath pipeline
         repeat(30) @(posedge clk);
 
         $display("==================================================");
@@ -126,9 +133,10 @@ module tb_top_cnn_accelerator;
             $display("[SUCCESS] Correct number of output pixels generated (%0d).", EXPECTED_VALIDS);
         end
 
-        if (errors == 0) $display("   TEST PASSED SUCCESSFULLY!");
+        if (errors == 0) $display("   4x4 PARAMETERIZATION TEST PASSED SUCCESSFULLY!");
         else             $display("   TEST FAILED! Total errors: %0d", errors);
         $display("==================================================");
         $finish;
     end
+
 endmodule

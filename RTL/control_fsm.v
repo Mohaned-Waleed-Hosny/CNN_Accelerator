@@ -13,8 +13,6 @@ module control_fsm #(
     output wire valid_out
 );
 
-    assign shift_en = valid_in;
-
     // Explicit 2D Counters replacing Modulo/Division logic
     localparam COL_WIDTH = (IMAGE_WIDTH > 1)  ? $clog2(IMAGE_WIDTH)  : 1;
     localparam ROW_WIDTH = (IMAGE_HEIGHT > 1) ? $clog2(IMAGE_HEIGHT) : 1;
@@ -53,6 +51,11 @@ module control_fsm #(
             valid_pipeline <= {valid_pipeline[DATAPATH_LATENCY-2:0], valid_window};
         end
     end
+
+    // BUG FIX: Pipeline Flush Optimization.
+    // Keep the datapath shifting if there is STILL valid data propagating 
+    // inside the pipeline, even if valid_in has dropped to 0.
+    assign shift_en = valid_in | (|valid_pipeline);
 
     assign valid_out = valid_pipeline[DATAPATH_LATENCY-1];
 
